@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { submitPairedQuiz } from '@/app/pair-actions';
+import CopyInviteLink from '@/components/CopyInviteLink';
 import { couplesQuestions, activeCouplesModel, couplesScoringVersion, type CouplesQuestion, type ParticipantRole } from '@/lib/couples-questions';
 import { INDEPENDENT_RESPONSE_REMINDER, SAFETY_DISCLAIMER } from '@/lib/couples-copy';
 
@@ -130,7 +131,7 @@ export default function CouplesQuizForm({ pairId, participantId, role, inviteUrl
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
           <h2 className="text-lg font-extrabold text-ink">Invite Partner B</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700">Send this private link to your partner. Do not answer together; the comparison opens only after both submit.</p>
-          <code className="mt-3 block break-all rounded-2xl bg-white p-3 text-sm text-slate-800 ring-1 ring-amber-100">{inviteUrl}</code>
+          <CopyInviteLink inviteUrl={inviteUrl} />
         </section>
       ) : null}
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+import CopyInviteLink from '@/components/CopyInviteLink';
 import DeletePairButton from '@/components/DeletePairButton';
 import { getSql } from '@/lib/db';
 import { EXPIRY_NOTICE, SAFETY_DISCLAIMER } from '@/lib/couples-copy';
@@ -73,7 +74,7 @@ export default async function WaitingPage({ params }: { params: Promise<{ pairId
           <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
             <h2 className="text-lg font-extrabold text-ink">Partner B has not joined yet</h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">Share this private invite link. If the wrong person joins, delete this comparison and start a new one.</p>
-            <code className="mt-3 block break-all rounded-2xl bg-white p-3 text-sm text-slate-800 ring-1 ring-amber-100">{inviteUrl}</code>
+            <CopyInviteLink inviteUrl={inviteUrl} />
           </section>
         ) : null}
 
