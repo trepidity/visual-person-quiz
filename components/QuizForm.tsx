@@ -1,16 +1,30 @@
 'use client';
 
 import Image from 'next/image';
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useRef, useState, useTransition } from 'react';
 import { submitQuiz } from '@/app/actions';
 import type { Question } from '@/lib/questions';
 
 export default function QuizForm({ questions }: { questions: Question[] }) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [responseTimes, setResponseTimes] = useState<Record<string, number>>({});
+  const startedAt = useRef<Record<string, number>>({});
   const [isPending, startTransition] = useTransition();
   const answeredCount = Object.keys(answers).length;
   const isComplete = answeredCount === questions.length;
   const progress = useMemo(() => Math.round((answeredCount / questions.length) * 100), [answeredCount, questions.length]);
+
+  function markSeen(questionId: string) {
+    if (!startedAt.current[questionId]) {
+      startedAt.current[questionId] = performance.now();
+    }
+  }
+
+  function choose(questionId: string, optionId: string) {
+    const start = startedAt.current[questionId] || performance.now();
+    setAnswers((current) => ({ ...current, [questionId]: optionId }));
+    setResponseTimes((current) => ({ ...current, [questionId]: Math.round(performance.now() - start) }));
+  }
 
   return (
     <form
@@ -18,7 +32,7 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
       onSubmit={(event) => {
         event.preventDefault();
         if (!isComplete) return;
-        startTransition(() => submitQuiz({ answers, experimentLabel: 'mobile-first-v1' }));
+        startTransition(() => submitQuiz({ answers, responseTimes, experimentLabel: 'multidimensional-v1' }));
       }}
     >
       <div className="sticky top-0 z-10 -mx-4 bg-paper/95 px-4 py-3 backdrop-blur sm:mx-0 sm:px-0">
@@ -32,14 +46,20 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
       </div>
 
       {questions.map((question, index) => (
-        <fieldset key={question.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <fieldset
+          key={question.id}
+          onMouseEnter={() => markSeen(question.id)}
+          onFocus={() => markSeen(question.id)}
+          onTouchStart={() => markSeen(question.id)}
+          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
           <legend className="mb-4 text-lg font-extrabold text-ink">
             <span className="text-slate-400">{index + 1}. </span>{question.prompt}
           </legend>
           {question.helper ? <p className="mb-4 text-sm text-slate-600">{question.helper}</p> : null}
           {question.imageUrl ? (
             <div className="mb-4 overflow-hidden rounded-2xl border border-amber-100 bg-amber-50">
-              <Image src={question.imageUrl} alt="Illustration of a golden horse" width={900} height={520} className="h-auto w-full" priority={index === 0} />
+              <Image src={question.imageUrl} alt="A horse standing in a country landscape" width={900} height={520} className="h-auto w-full" priority={index === 0} />
             </div>
           ) : null}
 
@@ -58,7 +78,7 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
                     name={question.id}
                     value={option.id}
                     checked={selected}
-                    onChange={() => setAnswers((current) => ({ ...current, [question.id]: option.id }))}
+                    onChange={() => choose(question.id, option.id)}
                     className="mt-1 h-5 w-5 accent-visual"
                   />
                   <span className="text-base font-semibold leading-6 text-ink">{option.label}</span>
@@ -74,7 +94,7 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
         disabled={!isComplete || isPending}
         className="mb-8 rounded-2xl bg-ink px-5 py-4 text-lg font-black text-white shadow-lg transition enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300"
       >
-        {isPending ? 'Saving…' : isComplete ? 'See my result' : 'Answer all questions'}
+        {isPending ? 'Saving…' : isComplete ? 'See my response profile' : 'Answer all questions'}
       </button>
     </form>
   );

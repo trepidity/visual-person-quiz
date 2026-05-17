@@ -25,8 +25,13 @@ await sql`
   )
 `;
 
+await sql`alter table quiz_results add column if not exists scoring_version text`;
+await sql`alter table quiz_results add column if not exists raw_scores jsonb`;
+await sql`alter table quiz_results add column if not exists response_times jsonb`;
+
 await sql`create index if not exists quiz_results_created_at_idx on quiz_results(created_at desc)`;
 await sql`create index if not exists quiz_results_model_idx on quiz_results(model)`;
 await sql`create index if not exists quiz_results_result_type_idx on quiz_results(result_type)`;
+await sql`create index if not exists quiz_results_experiment_label_idx on quiz_results(experiment_label)`;
 
 console.log('Database schema is ready.');
