@@ -20,12 +20,30 @@ function rawScore(row, key) {
   return scores[key] ?? '';
 }
 
-const rows = await sql`
-  select id, created_at, model, scoring_version, experiment_label, result_type,
-         visual_pct, words_pct, raw_scores, answers
-  from quiz_results
-  order by created_at desc
+const [hasFlowTypeColumn] = await sql`
+  select exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'quiz_results'
+      and column_name = 'flow_type'
+  ) as exists
 `;
+
+const rows = hasFlowTypeColumn?.exists
+  ? await sql`
+      select id, created_at, model, scoring_version, experiment_label, result_type,
+             visual_pct, words_pct, raw_scores, answers
+      from quiz_results
+      where flow_type = 'solo'
+      order by created_at desc
+    `
+  : await sql`
+      select id, created_at, model, scoring_version, experiment_label, result_type,
+             visual_pct, words_pct, raw_scores, answers
+      from quiz_results
+      order by created_at desc
+    `;
 
 const headers = [
   'id',
