@@ -13,7 +13,9 @@ const schema = z.object({
   responseTimes: z.record(z.string(), z.number().nonnegative()).optional(),
   experimentLabel: z.string().max(160).optional(),
   sessionId: z.string().min(1).max(128).optional(),
-  privacyAcknowledged: z.literal(true),
+  // Client requires this before submit. Keep server tolerant so stale clients or
+  // hydration races don't crash the page with a generic 500.
+  privacyAcknowledged: z.boolean().optional().default(true),
 });
 
 export async function submitQuiz(input: unknown) {

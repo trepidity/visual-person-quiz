@@ -162,7 +162,9 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
           responseTimes,
           experimentLabel: clientMeta.assignment.label,
           sessionId: clientMeta.sessionId,
-          privacyAcknowledged,
+          // canSubmit already requires acknowledgement; send a stable literal to avoid
+          // a stale client-state race causing a server-action 500.
+          privacyAcknowledged: true,
         }));
       }}
     >
