@@ -25,7 +25,7 @@ export const questions: Question[] = [
     kind: 'image',
     prompt: 'When you see this image, what comes to mind first?',
     helper: 'The point is not being right. It is what your brain grabs first.',
-    imageUrl: '/horse.svg',
+    imageUrl: '/horse.png',
     options: [
       { id: 'horse', label: 'A horse', visualScore: 1, wordsScore: 2, detailScore: 0 },
       { id: 'palomino', label: 'A palomino', visualScore: 3, wordsScore: 0, detailScore: 2 },

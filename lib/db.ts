@@ -1,7 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 
-if (!process.env.DATABASE_URL) {
-  console.warn('DATABASE_URL is not set. Database writes will fail until Neon is configured.');
+export function getSql() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required for database operations.');
+  }
+  return neon(databaseUrl);
 }
-
-export const sql = neon(process.env.DATABASE_URL || 'DATABASE_URL_NOT_CONFIGURED');

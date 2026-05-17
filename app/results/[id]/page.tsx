@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { sql } from '@/lib/db';
+import { getSql } from '@/lib/db';
 
 type ResultRow = {
   id: string;
@@ -17,6 +17,7 @@ type ResultRow = {
 
 export default async function ResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const sql = getSql();
   const rows = await sql`select * from quiz_results where id = ${id} limit 1`;
   const result = rows[0] as ResultRow | undefined;
   if (!result) notFound();

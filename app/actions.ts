@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { sql } from '@/lib/db';
+import { getSql } from '@/lib/db';
 import { activeModel, classify, questions } from '@/lib/questions';
 
 const schema = z.object({
@@ -39,6 +39,7 @@ export async function submitQuiz(input: unknown) {
   const result = classify(visualScore, wordsScore);
   const h = await headers();
   const userAgent = h.get('user-agent');
+  const sql = getSql();
 
   const rows = await sql`
     insert into quiz_results (
