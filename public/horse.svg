@@ -1,0 +1,14 @@
+<svg width="900" height="520" viewBox="0 0 900 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="520" rx="36" fill="#F7F1E8"/>
+  <circle cx="710" cy="108" r="58" fill="#FBBF24" opacity="0.45"/>
+  <path d="M168 363c18-70 58-122 136-131 43-5 79 8 115 27 38 20 87 30 134 18 50-12 82-43 113-83 24-31 61-48 98-40 24 5 42 18 54 38-34 2-61 18-81 47-17 24-28 54-39 82-19 50-52 84-107 96-64 15-118-4-173-34-34-18-69-31-108-23-43 9-74 35-99 70-14-17-29-38-43-65z" fill="#D6A24A"/>
+  <path d="M670 167c-21-38-53-61-97-64-24-2-43 5-62 18 12 3 24 9 35 18-28-2-55 7-80 25 59-4 118 15 164 54l40-51z" fill="#E8C46C"/>
+  <path d="M212 425l45-4 35-134-52-7-28 145zM522 430l46-2 10-142-52 7-4 137zM620 419l43-3-16-126-49 14 22 115z" fill="#7A4E25"/>
+  <path d="M319 235c-16 57 0 107 44 151" stroke="#7A4E25" stroke-width="15" stroke-linecap="round"/>
+  <path d="M746 183c30-20 54-16 74 12-22 1-40 13-54 35" stroke="#7A4E25" stroke-width="16" stroke-linecap="round"/>
+  <path d="M669 164l38-66 19 62" fill="#D6A24A"/>
+  <path d="M689 172c20-6 43-4 62 7" stroke="#7A4E25" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="710" cy="151" r="8" fill="#111827"/>
+  <path d="M238 245c-44 7-81 30-110 69 16-64 51-102 105-116 15-4 28 12 20 26l-15 21z" fill="#E8C46C"/>
+  <text x="48" y="70" font-family="Arial, sans-serif" font-size="26" fill="#111827" opacity="0.72">What do you see first?</text>
+</svg>
