@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:push": "node scripts/db-push.mjs"
+    "db:push": "node scripts/db-push.mjs",
+    "report": "node scripts/report.mjs",
+    "export:results": "node scripts/export-results.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "latest",

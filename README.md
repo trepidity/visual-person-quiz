@@ -4,10 +4,13 @@ Mobile-first Next.js + TailwindCSS questionnaire backed by Neon Postgres.
 
 ## What it does
 
-- Asks whether someone tends to process visually or verbally.
-- Starts with the horse question: do they see a horse, a palomino, visual qualities, or a sentence?
-- Stores results in Postgres with the question model label for A/B testing.
-- Shows the participant their results immediately.
+- Asks how someone tends to grab meaning first: objects/details, scenes/gist, visual features, spatial structure, words/narrative, or imagery vividness.
+- Starts with the horse question and adds direct self-report plus lightweight task-style scenarios.
+- Shows a calibrated result immediately, including practical takeaways.
+- Uses normalized dimension percentages so bars are not raw totals.
+- Shows blended/inconclusive results when the top two normalized dimensions are close.
+- Assigns each browser to an experiment arm for copy/flow comparison.
+- Stores start, completion, and abandonment events when the analytics table is available.
 - Requires no authentication.
 
 ## Run locally
@@ -44,16 +47,44 @@ Table: `quiz_results`
 
 Important columns:
 
-- `model` — question/model version, e.g. `A`
+- `model` — question/model version, e.g. `B`
 - `visual_score`
 - `words_score`
 - `detail_score`
 - `result_type`
 - `visual_pct`
 - `words_pct`
-- `answers` — JSONB answer payload
-- `experiment_label` — A/B training label
+- `answers` — JSONB answer payload, including normalized multidimensional profile
+- `experiment_label` — assigned experiment arm, e.g. `quiz-flow-v2:balanced-result-copy`
+- `scoring_version`
+- `raw_scores`
+- `response_times`
+- `session_id`
 - `created_at`
+
+Table: `quiz_events`
+
+Important columns:
+
+- `event_type` — `start`, `complete`, or `abandon`
+- `session_id`
+- `experiment_label`
+- `answered_count`
+- `total_questions`
+- `result_id`
+- `metadata`
+- `created_at`
+
+## Reporting/export
+
+There is no unauthenticated public admin page. Use server-side scripts:
+
+```bash
+npm run report
+npm run export:results > results.csv
+```
+
+See `docs/validation-roadmap.md` for validation and privacy notes.
 
 ## Questions we should ask
 
@@ -79,20 +110,27 @@ Good questions separate:
 6. **Description style**
    - Layout/rooms/colors vs facts/events/stories.
 
+7. **Indirect task-style preferences**
+   - Which cue would they create for recall?
+   - How would they rebuild a messy process from memory?
+
 ## A/B model training ideas
 
 Model A asks direct self-report questions.
 
-Model B could later ask indirect tasks:
+Model B mixes direct self-report with indirect task-style scenarios.
+
+Later task versions could:
 
 - show an image briefly, then ask what they remembered
-- ask them to choose between two explanations of the same idea
+- ask people to choose between two explanations of the same idea
 - ask them to reconstruct directions from memory
 - measure whether concrete images or written labels improve recall
 
-Store model/version in `quiz_results.model` and compare:
+Store model/version and experiment assignment, then compare:
 
 - completion rate
+- abandonment rate
 - score distribution
 - answer consistency
 - repeat-take stability
