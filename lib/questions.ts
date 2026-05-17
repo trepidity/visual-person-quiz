@@ -29,6 +29,7 @@ export const questions: Question[] = [
     options: [
       { id: 'horse', label: 'A horse', visualScore: 1, wordsScore: 2, detailScore: 0 },
       { id: 'palomino', label: 'A palomino', visualScore: 3, wordsScore: 0, detailScore: 2 },
+      { id: 'country-landscape', label: 'The country or landscape around it', visualScore: 3, wordsScore: 0, detailScore: 1 },
       { id: 'color-shape', label: 'Color, shape, movement, or texture', visualScore: 3, wordsScore: 0, detailScore: 1 },
       { id: 'sentence', label: 'A sentence or description about the image', visualScore: 0, wordsScore: 3, detailScore: 0 },
     ],
