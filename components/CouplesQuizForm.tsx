@@ -182,19 +182,19 @@ export default function CouplesQuizForm({ pairId, participantId, role, inviteUrl
               <input type="radio" name={question.id} value={alternateCouplesAnswerId} checked={answers[question.id] === alternateCouplesAnswerId} onChange={() => choose(question.id, alternateCouplesAnswerId)} className="mt-1 h-5 w-5 accent-visual" />
               <span className="text-base font-semibold leading-6 text-ink">Other / I’d answer differently</span>
             </label>
-            {answers[question.id] === alternateCouplesAnswerId ? (
+            {answers[question.id] ? (
               <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
-                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>What would you say instead?</label>
+                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>Optional: add your own wording or context</label>
                 <textarea
                   id={`${question.id}-alternate`}
                   value={alternateAnswers[question.id] ?? ''}
                   onChange={(event) => setAlternateAnswers((current) => ({ ...current, [question.id]: event.target.value.slice(0, 500) }))}
                   rows={3}
                   maxLength={500}
-                  placeholder="Short answer. Avoid names or private details."
+                  placeholder="If this choice is close but not exact, say how you’d put it. Avoid names or private details."
                   className="mt-2 w-full rounded-2xl border border-violet-100 bg-white p-3 text-sm leading-6 text-ink outline-none ring-0 focus:border-visual"
                 />
-                <p className="mt-2 text-xs leading-5 text-slate-600">This free-form note is stored for research/context and does not affect scoring.</p>
+                <p className="mt-2 text-xs leading-5 text-slate-600">This note is stored for context/research and does not affect scoring.</p>
               </div>
             ) : null}
           </div>

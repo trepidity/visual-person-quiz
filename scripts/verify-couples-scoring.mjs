@@ -75,6 +75,17 @@ try {
   assert.equal(alternateAnswers[0].freeformText, 'None of these fit how I saw it.');
   logCheck('Alternate free-form answer is stored but does not affect scoring');
 
+  const regularNoteAnswers = scoring.enrichCouplesAnswers(
+    { c1_image_first_grab: 'main-object' },
+    {},
+    couplesQuestions,
+    { requireComplete: false, alternateAnswers: { c1_image_first_grab: 'Horse, but with more emphasis on motion.' } },
+  );
+  assert.equal(regularNoteAnswers[0].answerId, 'main-object');
+  assert.equal(regularNoteAnswers[0].freeformText, 'Horse, but with more emphasis on motion.');
+  assert.ok(scoring.scoreCouplesAnswers(regularNoteAnswers).objectCategory > 0, 'regular answer note should preserve selected-answer scoring');
+  logCheck('Free-form context can be attached to any selected answer without changing its scoring');
+
   const c9OnlyAnswers = scoring.enrichCouplesAnswers(
     { c9_imagery_band: 'vivid' },
     {},
