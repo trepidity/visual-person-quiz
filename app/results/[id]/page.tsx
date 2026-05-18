@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getSql } from '@/lib/db';
 import { dimensionInterpretations, type DimensionKey, type DimensionScores, type ProfileTakeaway } from '@/lib/questions';
 
-type Answer = { questionId: string; prompt: string; answerLabel: string | null; construct?: string; responseTimeMs?: number | null };
+type Answer = { questionId: string; prompt: string; answerLabel: string | null; freeformText?: string | null; construct?: string; responseTimeMs?: number | null };
 type Dimension = {
   key: DimensionKey;
   label: string;
@@ -123,6 +123,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
               <div key={answer.questionId} className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-sm font-semibold text-slate-500">{answer.prompt}</p>
                 <p className="mt-1 font-bold text-ink">{answer.answerLabel}</p>
+                {answer.freeformText ? <p className="mt-2 text-sm leading-6 text-slate-700">“{answer.freeformText}”</p> : null}
                 {answer.responseTimeMs ? <p className="mt-1 text-xs text-slate-500">Response time: {Math.round(answer.responseTimeMs / 100) / 10}s</p> : null}
               </div>
             ))}

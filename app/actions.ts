@@ -10,6 +10,7 @@ import { activeModel, addScores, emptyScores, profileFromScores, questions, scor
 
 const schema = z.object({
   answers: z.record(z.string(), z.string()),
+  alternateAnswers: z.record(z.string(), z.string().max(500)).optional(),
   responseTimes: z.record(z.string(), z.number().nonnegative()).optional(),
   experimentLabel: z.string().max(160).optional(),
   sessionId: z.string().min(1).max(128).optional(),
@@ -17,6 +18,12 @@ const schema = z.object({
   // hydration races don't crash the page with a generic 500.
   privacyAcknowledged: z.boolean().optional().default(true),
 });
+
+function sanitizeFreeform(value: string | undefined) {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  return trimmed ? trimmed.slice(0, 500) : undefined;
+}
 
 export async function submitQuiz(input: unknown) {
   const parsed = schema.parse(input);
@@ -42,6 +49,7 @@ export async function submitQuiz(input: unknown) {
       displayOrder: index + 1,
       answerId: selected?.id || null,
       answerLabel: selected?.label || null,
+      freeformText: sanitizeFreeform(parsed.alternateAnswers?.[q.id]),
       scores: selected?.scores || emptyScores(),
       responseTimeMs: parsed.responseTimes?.[q.id] ?? null,
     };

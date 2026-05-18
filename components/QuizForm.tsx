@@ -75,6 +75,7 @@ function sendQuizEvent(payload: Record<string, unknown>, preferBeacon = false) {
 
 export default function QuizForm({ questions }: { questions: Question[] }) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [alternateAnswers, setAlternateAnswers] = useState<Record<string, string>>({});
   const [responseTimes, setResponseTimes] = useState<Record<string, number>>({});
   const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false);
   const [clientMeta, setClientMeta] = useState<ClientMeta>(() => readOrCreateClientMeta());
@@ -159,6 +160,7 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
         completedRef.current = true;
         startTransition(() => submitQuiz({
           answers,
+          alternateAnswers,
           responseTimes,
           experimentLabel: clientMeta.assignment.label,
           sessionId: clientMeta.sessionId,
@@ -218,6 +220,21 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
                 </label>
               );
             })}
+            {answers[question.id] ? (
+              <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
+                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>Optional: add your own wording or context</label>
+                <textarea
+                  id={`${question.id}-alternate`}
+                  value={alternateAnswers[question.id] ?? ''}
+                  onChange={(event) => setAlternateAnswers((current) => ({ ...current, [question.id]: event.target.value.slice(0, 500) }))}
+                  rows={3}
+                  maxLength={500}
+                  placeholder="If this choice is close but not exact, say how you’d put it. Avoid names or private details."
+                  className="mt-2 w-full rounded-2xl border border-violet-100 bg-white p-3 text-sm leading-6 text-ink outline-none ring-0 focus:border-visual"
+                />
+                <p className="mt-2 text-xs leading-5 text-slate-600">This note is stored for context/research and does not affect scoring.</p>
+              </div>
+            ) : null}
           </div>
         </fieldset>
       ))}
