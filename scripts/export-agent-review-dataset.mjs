@@ -98,6 +98,7 @@ function answerRowsFromPayload(payload) {
           questionId,
           answerId: value.answerId ?? value.selectedAnswerId ?? value.id ?? value.value ?? null,
           answerLabel: value.answerLabel ?? value.label ?? null,
+          freeformText: value.freeformText ?? null,
           prompt: value.prompt ?? questionId,
           scores: value.scores ?? null,
           responseTimeMs: value.responseTimeMs ?? null,
@@ -481,7 +482,9 @@ function buildAnswerMatrix(resultsForMatrix, answersKey = 'answers') {
     const responseTimes = {};
     for (const answer of answerRowsFromPayload(result[answersKey])) {
       selected[answer.questionId] = answer.answerId;
-      labels[answer.questionId] = answer.answerLabel;
+      labels[answer.questionId] = answer.freeformText
+        ? `${answer.answerLabel}: ${answer.freeformText}`
+        : answer.answerLabel;
       responseTimes[answer.questionId] = answer.responseTimeMs;
     }
     return {
@@ -514,6 +517,7 @@ function buildQuestionCounts(resultsForCounts, answersKey = 'answers') {
         prompt: answer.prompt ?? answer.questionId,
         answerId: answer.answerId,
         answerLabel: answer.answerLabel,
+        freeformText: answer.freeformText ?? null,
         count: 0,
         scores: answer.scores,
       };

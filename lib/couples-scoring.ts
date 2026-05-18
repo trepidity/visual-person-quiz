@@ -23,6 +23,9 @@ export type LensProfileDimension = {
   sharePct: number;
 };
 
+export const alternateCouplesAnswerId = '__other__';
+export const alternateCouplesAnswerLabel = 'Other / I’d answer differently';
+
 export type EnrichedCouplesAnswer = {
   questionId: string;
   itemVersion: string;
@@ -32,6 +35,7 @@ export type EnrichedCouplesAnswer = {
   displayOrder: number;
   answerId: string;
   answerLabel: string;
+  freeformText?: string;
   scores: LensScores;
   tags: CouplesAnswerTag[];
   responseTimeMs: number | null;
@@ -104,6 +108,7 @@ export type PairComparisonReport = {
 
 export type EnrichCouplesAnswersOptions = {
   requireComplete?: boolean;
+  alternateAnswers?: Record<string, string | null | undefined>;
 };
 
 export type CouplesProfileBuildResult = {
@@ -200,11 +205,14 @@ export function enrichCouplesAnswers(
       return;
     }
 
-    const option = question.options.find((candidate) => candidate.id === answerId);
-    if (!option) {
+    const isAlternate = answerId === alternateCouplesAnswerId;
+    const option = isAlternate ? null : question.options.find((candidate) => candidate.id === answerId);
+    if (!isAlternate && !option) {
       throw new Error(`Invalid answer '${answerId}' for Model C question: ${question.id}`);
     }
 
+    const selectedOption = option;
+    const freeformText = isAlternate ? sanitizeAlternateAnswerText(options.alternateAnswers?.[question.id]) : undefined;
     const responseTime = responseTimes[question.id];
     const responseTimeMs = typeof responseTime === 'number' && Number.isFinite(responseTime)
       ? Math.max(0, Math.round(responseTime))
@@ -217,15 +225,22 @@ export function enrichCouplesAnswers(
       construct: question.construct,
       prompt: question.prompt,
       displayOrder: index,
-      answerId: option.id,
-      answerLabel: option.label,
-      scores: option.scores,
-      tags: option.tags ?? [],
+      answerId: isAlternate ? alternateCouplesAnswerId : selectedOption!.id,
+      answerLabel: isAlternate ? alternateCouplesAnswerLabel : selectedOption!.label,
+      freeformText,
+      scores: isAlternate ? emptyLensScores() : selectedOption!.scores,
+      tags: isAlternate ? [] : (selectedOption!.tags ?? []),
       responseTimeMs,
     });
   });
 
   return answers;
+}
+
+function sanitizeAlternateAnswerText(value: string | null | undefined): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  return trimmed ? trimmed.slice(0, 500) : undefined;
 }
 
 export function scoreCouplesAnswers(answers: EnrichedCouplesAnswer[]): LensScores {

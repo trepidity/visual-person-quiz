@@ -64,6 +64,17 @@ try {
   assert.deepEqual(syntheticC3Max, emptyLensScores(), 'partnerPrediction max-score contribution should be excluded');
   logCheck('C3 contributes zero and is excluded from max-score normalization');
 
+  const alternateAnswers = scoring.enrichCouplesAnswers(
+    { c1_image_first_grab: scoring.alternateCouplesAnswerId },
+    {},
+    couplesQuestions,
+    { requireComplete: false, alternateAnswers: { c1_image_first_grab: 'None of these fit how I saw it.' } },
+  );
+  const alternateProfile = scoring.profileFromLensScores(scoring.scoreCouplesAnswers(alternateAnswers), alternateAnswers);
+  assert.equal(alternateProfile.topLenses.length, 0, 'alternate/freeform-only answer should not produce top lenses');
+  assert.equal(alternateAnswers[0].freeformText, 'None of these fit how I saw it.');
+  logCheck('Alternate free-form answer is stored but does not affect scoring');
+
   const c9OnlyAnswers = scoring.enrichCouplesAnswers(
     { c9_imagery_band: 'vivid' },
     {},

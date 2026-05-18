@@ -7,12 +7,13 @@ import { z } from 'zod';
 import { getSql } from '@/lib/db';
 import { recordQuizEvent } from '@/lib/quiz-events';
 import { activeCouplesModel, couplesQuestions, couplesScoringVersion, type ParticipantRole } from '@/lib/couples-questions';
-import { buildCouplesProfile } from '@/lib/couples-scoring';
+import { alternateCouplesAnswerId, buildCouplesProfile } from '@/lib/couples-scoring';
 
 const submitPairSchema = z.object({
   pairId: z.string().uuid(),
   participantId: z.string().uuid(),
   answers: z.record(z.string(), z.string()),
+  alternateAnswers: z.record(z.string(), z.string().max(500)).optional(),
   responseTimes: z.record(z.string(), z.number().nonnegative()).optional(),
   sessionId: z.string().min(1).max(128).optional(),
   privacyAcknowledged: z.boolean().optional().default(true),
@@ -143,13 +144,20 @@ export async function recordInviteOpened(input: unknown) {
 export async function submitPairedQuiz(input: unknown) {
   const parsed = submitPairSchema.parse(input);
   const missingAnswers = couplesQuestions.filter((question) => !parsed.answers[question.id]);
-  const invalidAnswers = couplesQuestions.filter((question) => parsed.answers[question.id] && !question.options.some((option) => option.id === parsed.answers[question.id]));
+  const invalidAnswers = couplesQuestions.filter((question) => {
+    const answerId = parsed.answers[question.id];
+    if (!answerId || answerId === alternateCouplesAnswerId) return false;
+    return !question.options.some((option) => option.id === answerId);
+  });
   if (missingAnswers.length > 0 || invalidAnswers.length > 0) {
     throw new Error('Please answer every question before submitting.');
   }
 
   const sql = getSql();
-  const profileResult = buildCouplesProfile(parsed.answers, parsed.responseTimes ?? {}, couplesQuestions, { requireComplete: true });
+  const profileResult = buildCouplesProfile(parsed.answers, parsed.responseTimes ?? {}, couplesQuestions, {
+    requireComplete: true,
+    alternateAnswers: parsed.alternateAnswers ?? {},
+  });
   const h = await headers();
   const userAgent = h.get('user-agent');
 

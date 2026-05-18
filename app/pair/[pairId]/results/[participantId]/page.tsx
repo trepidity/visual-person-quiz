@@ -93,8 +93,16 @@ export default async function PairResultsPage({ params }: { params: Promise<{ pa
                 <div key={answerA.questionId} className="rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-500">{answerA.prompt}</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100"><p className="text-xs font-bold text-slate-500">Partner A</p><p className="mt-1 font-semibold text-ink">{answerA.answerLabel}</p></div>
-                    <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100"><p className="text-xs font-bold text-slate-500">Partner B</p><p className="mt-1 font-semibold text-ink">{answerB.answerLabel}</p></div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100">
+                      <p className="text-xs font-bold text-slate-500">Partner A</p>
+                      <p className="mt-1 font-semibold text-ink">{answerA.answerLabel}</p>
+                      {answerA.freeformText ? <p className="mt-2 text-sm leading-6 text-slate-700">“{answerA.freeformText}”</p> : null}
+                    </div>
+                    <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100">
+                      <p className="text-xs font-bold text-slate-500">Partner B</p>
+                      <p className="mt-1 font-semibold text-ink">{answerB.answerLabel}</p>
+                      {answerB.freeformText ? <p className="mt-2 text-sm leading-6 text-slate-700">“{answerB.freeformText}”</p> : null}
+                    </div>
                   </div>
                 </div>
               );
