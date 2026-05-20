@@ -117,6 +117,14 @@ export default function CouplesQuizForm({ pairId, participantId, role, inviteUrl
     const start = startedAt.current[questionId] || performance.now();
     setAnswers((current) => ({ ...current, [questionId]: optionId }));
     setResponseTimes((current) => ({ ...current, [questionId]: Math.round(performance.now() - start) }));
+    if (optionId !== alternateCouplesAnswerId) {
+      setAlternateAnswers((current) => {
+        if (!(questionId in current)) return current;
+        const next = { ...current };
+        delete next[questionId];
+        return next;
+      });
+    }
   }
 
   return (
@@ -182,9 +190,9 @@ export default function CouplesQuizForm({ pairId, participantId, role, inviteUrl
               <input type="radio" name={question.id} value={alternateCouplesAnswerId} checked={answers[question.id] === alternateCouplesAnswerId} onChange={() => choose(question.id, alternateCouplesAnswerId)} className="mt-1 h-5 w-5 accent-visual" />
               <span className="text-base font-semibold leading-6 text-ink">Other / I’d answer differently</span>
             </label>
-            {answers[question.id] ? (
+            {answers[question.id] === alternateCouplesAnswerId ? (
               <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
-                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>Optional: add your own wording or context</label>
+                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>Optional: write your alternate answer</label>
                 <textarea
                   id={`${question.id}-alternate`}
                   value={alternateAnswers[question.id] ?? ''}

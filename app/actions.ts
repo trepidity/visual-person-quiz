@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { getSql } from '@/lib/db';
 import { assignExperimentArm } from '@/lib/experiments';
 import { recordQuizEvent } from '@/lib/quiz-events';
-import { activeModel, addScores, emptyScores, profileFromScores, questions, scoringVersion } from '@/lib/questions';
+import { activeModel, addScores, alternateAnswerId, alternateAnswerLabel, emptyScores, profileFromScores, questions, scoringVersion } from '@/lib/questions';
 
 const schema = z.object({
   answers: z.record(z.string(), z.string()),
@@ -28,7 +28,10 @@ function sanitizeFreeform(value: string | undefined) {
 export async function submitQuiz(input: unknown) {
   const parsed = schema.parse(input);
   const missingAnswers = questions.filter((question) => !parsed.answers[question.id]);
-  const invalidAnswers = questions.filter((question) => parsed.answers[question.id] && !question.options.some((option) => option.id === parsed.answers[question.id]));
+  const invalidAnswers = questions.filter((question) => {
+    const answerId = parsed.answers[question.id];
+    return answerId && answerId !== alternateAnswerId && !question.options.some((option) => option.id === answerId);
+  });
   if (missingAnswers.length > 0 || invalidAnswers.length > 0) {
     throw new Error('Please answer every question before submitting.');
   }
@@ -36,7 +39,8 @@ export async function submitQuiz(input: unknown) {
   let rawScores = emptyScores();
 
   const enrichedAnswers = questions.map((q, index) => {
-    const selected = q.options.find((o) => o.id === parsed.answers[q.id]);
+    const isAlternate = parsed.answers[q.id] === alternateAnswerId;
+    const selected = isAlternate ? null : q.options.find((o) => o.id === parsed.answers[q.id]);
     if (selected) {
       rawScores = addScores(rawScores, selected.scores);
     }
@@ -47,9 +51,9 @@ export async function submitQuiz(input: unknown) {
       construct: q.construct,
       prompt: q.prompt,
       displayOrder: index + 1,
-      answerId: selected?.id || null,
-      answerLabel: selected?.label || null,
-      freeformText: sanitizeFreeform(parsed.alternateAnswers?.[q.id]),
+      answerId: isAlternate ? alternateAnswerId : selected?.id || null,
+      answerLabel: isAlternate ? alternateAnswerLabel : selected?.label || null,
+      freeformText: isAlternate ? sanitizeFreeform(parsed.alternateAnswers?.[q.id]) : undefined,
       scores: selected?.scores || emptyScores(),
       responseTimeMs: parsed.responseTimes?.[q.id] ?? null,
     };

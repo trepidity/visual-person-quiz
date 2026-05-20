@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { submitQuiz } from '@/app/actions';
-import { activeModel, scoringVersion, type Question } from '@/lib/questions';
+import { activeModel, alternateAnswerId, alternateAnswerLabel, scoringVersion, type Question } from '@/lib/questions';
 import { assignExperimentArm, type ExperimentAssignment } from '@/lib/experiments';
 
 type ClientMeta = {
@@ -149,6 +149,14 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
       return next;
     });
     setResponseTimes((current) => ({ ...current, [questionId]: Math.round(performance.now() - start) }));
+    if (optionId !== alternateAnswerId) {
+      setAlternateAnswers((current) => {
+        if (!(questionId in current)) return current;
+        const next = { ...current };
+        delete next[questionId];
+        return next;
+      });
+    }
   }
 
   return (
@@ -220,9 +228,24 @@ export default function QuizForm({ questions }: { questions: Question[] }) {
                 </label>
               );
             })}
-            {answers[question.id] ? (
+            <label
+              className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                answers[question.id] === alternateAnswerId ? 'border-visual bg-violet-50 ring-2 ring-violet-100' : 'border-slate-200 bg-white active:scale-[0.99]'
+              }`}
+            >
+              <input
+                type="radio"
+                name={question.id}
+                value={alternateAnswerId}
+                checked={answers[question.id] === alternateAnswerId}
+                onChange={() => choose(question.id, alternateAnswerId)}
+                className="mt-1 h-5 w-5 accent-visual"
+              />
+              <span className="text-base font-semibold leading-6 text-ink">{alternateAnswerLabel}</span>
+            </label>
+            {answers[question.id] === alternateAnswerId ? (
               <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
-                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>Optional: add your own wording or context</label>
+                <label className="text-sm font-bold text-ink" htmlFor={`${question.id}-alternate`}>Optional: write your alternate answer</label>
                 <textarea
                   id={`${question.id}-alternate`}
                   value={alternateAnswers[question.id] ?? ''}

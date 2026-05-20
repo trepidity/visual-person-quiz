@@ -212,7 +212,7 @@ export function enrichCouplesAnswers(
     }
 
     const selectedOption = option;
-    const freeformText = sanitizeAlternateAnswerText(options.alternateAnswers?.[question.id]);
+    const freeformText = isAlternate ? sanitizeAlternateAnswerText(options.alternateAnswers?.[question.id]) : undefined;
     const responseTime = responseTimes[question.id];
     const responseTimeMs = typeof responseTime === 'number' && Number.isFinite(responseTime)
       ? Math.max(0, Math.round(responseTime))

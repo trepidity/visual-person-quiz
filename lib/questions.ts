@@ -65,6 +65,8 @@ export type ResponseProfile = {
 export const activeModel = 'B' as const;
 export const scoringVersion = 'multidimensional-v2';
 export const blendThresholdPct = 8;
+export const alternateAnswerId = '__other__';
+export const alternateAnswerLabel = 'Other / I’d answer differently';
 
 export const dimensionKeys = [
   'objectDetail',
